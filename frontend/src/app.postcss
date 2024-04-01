@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@tailwind variants;
+
+html,
+body {
+  @apply h-full overflow-hidden;
+}
+
+@font-face {
+	font-family: 'RobotoSlab';
+	src: url('/fonts/RobotoSlab-VariableFont_wght.ttf');
+}
+
+:root [data-theme='wintry'] {
+    --theme-font-family-base: 'RobotoSlab', serif;
+    --theme-font-family-heading: 'RobotoSlab', serif;
+}
