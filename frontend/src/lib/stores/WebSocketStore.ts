@@ -66,7 +66,7 @@ function createWebSocketStore(url: string) {
         if (!socket || socket.readyState === WebSocket.CLOSED) {
             console.log(`Attempting to reconnect in ${reconnectDelay}ms...`);
             reconnectTimer = setTimeout(connect, reconnectDelay);
-            reconnectDelay *= 2; // Double the reconnect delay for each attempt (exponential backoff)
+            reconnectDelay *= 2;
         }
     }
 

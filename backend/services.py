@@ -8,6 +8,8 @@ from langchain_google_genai.chat_models import ChatGoogleGenerativeAI
 import models
 import schemas
 
+config = toml.load("../settings.toml")
+
 
 async def process_message(
     db: Session,
@@ -119,7 +121,6 @@ async def process_message(
 
 
 def _get_chat_model(settings: dict):
-    config = toml.load("../settings.toml")
     model = settings["model"]
     max_tokens = settings.get("max_tokens", None)
 
@@ -223,7 +224,9 @@ def generate_title(conversation_id: int, db: Session):
             if "text" in content_block and content_block["text"]:
                 user_message += f"{message.role}: {content_block['text']}\n\n"
 
-    model = ChatOpenAI(model="gpt-4-turbo-preview")
+    model = ChatOpenAI(
+        model="gpt-4-turbo-preview", api_key=config["api_keys"]["OPENAI_API_KEY"]
+    )
     chain = model | JsonOutputParser()
     result = chain.invoke([("system", system_message), ("user", user_message)])
 
