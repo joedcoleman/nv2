@@ -8,10 +8,13 @@
   } from "$lib/stores/ConversationStore";
   import { v4 as uuidv4 } from "uuid";
   import { currentModel } from "$lib/stores/SettingsStore";
-  import { FileButton } from "@skeletonlabs/skeleton";
+  import { isConnected } from "$lib/stores/WebSocketStore";
+  import { FileButton, getToastStore } from "@skeletonlabs/skeleton";
+  import type { ToastSettings } from "@skeletonlabs/skeleton";
   import GridiconsAddImage from "~icons/gridicons/add-image";
   import MingcuteSendPlaneFill from "~icons/mingcute/send-plane-fill";
 
+  const toastStore = getToastStore();
   let textareaElement: HTMLTextAreaElement;
   let images: FileList | undefined;
   let thumbnailURL: string | undefined;
@@ -32,6 +35,14 @@
   }
 
   async function sendMessage() {
+    if (!$isConnected) {
+      const t: ToastSettings = {
+        message: "WebSocket not connected. Refresh and try again.",
+        background: "variant-filled-error",
+      };
+      toastStore.trigger(t);
+      return;
+    }
     if ($currentMessage.trim() !== "" || (images && images?.length > 0)) {
       const newMessage: Message = {
         id: uuidv4(),

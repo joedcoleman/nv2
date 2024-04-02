@@ -3,10 +3,10 @@ import toml
 from fastapi import APIRouter, WebSocket, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
-from services import process_message
 from database import get_db
 import schemas
-import services
+import services.services as services
+from services.websocket_manager import websocket_manager
 
 router = APIRouter()
 
@@ -17,16 +17,14 @@ config = toml.load("../settings.toml")
 
 @router.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket, db: Session = Depends(get_db)):
-    await websocket.accept()
-    while True:
-        try:
+    await websocket_manager.connect(websocket)
+    try:
+        while True:
             message = await websocket.receive_json()
-            async for chunk in process_message(db, message):
-                await websocket.send_json(chunk)
-
-        except Exception as e:
-            print(f"Error: {e}")
-            break
+            async for chunk in services.process_message(db, message):
+                await websocket_manager.send_message(chunk)
+    except Exception as e:
+        print(f"Error: {e}")
 
 
 @router.get("/conversations/{conversation_id}", response_model=schemas.ConversationOut)

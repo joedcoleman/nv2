@@ -1,17 +1,20 @@
 <script lang="ts">
-  import { popup } from "@skeletonlabs/skeleton";
-  import type { PopupSettings } from "@skeletonlabs/skeleton";
+  import { ProgressBar } from "@skeletonlabs/skeleton";
+  import { Toast, getToastStore } from "@skeletonlabs/skeleton";
+  import type { ToastSettings, ToastStore } from "@skeletonlabs/skeleton";
   import { beforeUpdate, afterUpdate, onMount, tick } from "svelte";
   import { goto } from "$app/navigation";
   import { page } from "$app/stores";
   import { currentConversation } from "$lib/stores/ConversationStore";
-  import { webSocketStore } from "$lib/stores/WebSocketStore";
+  import { webSocketStore, messageIncoming } from "$lib/stores/WebSocketStore";
   import { currentModel } from "$lib/stores/SettingsStore";
   import { scrollToBottom } from "$lib/actions/scrollToBottom";
   import ChatInput from "$lib/components/ChatInput.svelte";
   import MessageView from "$lib/components/MessageView.svelte";
   import PajamasGoBack from "~icons/pajamas/go-back";
   import ModelSelector from "$lib/components/common/ModelSelector.svelte";
+
+  const toastStore = getToastStore();
 
   $: currentMessages = $currentConversation?.messages || [];
   $: userSentLastMessage =
@@ -20,6 +23,14 @@
   let chatWindow: HTMLElement;
   let autoscroll: boolean;
   const threshold = 50;
+
+  let showModelSelector = false;
+
+  onMount(() => {
+    setTimeout(() => {
+      showModelSelector = true;
+    }, 500);
+  });
 
   beforeUpdate(() => {
     autoscroll =
@@ -51,11 +62,20 @@
 
   $: comboboxValue = $currentModel;
   $: currentModel.set(comboboxValue);
+
+  $: if ($messageIncoming === "error") {
+    const t: ToastSettings = {
+      message: "Chat model not responding. Try again in a moment.",
+      background: "variant-filled-error",
+    };
+    toastStore.trigger(t);
+    messageIncoming.set("false");
+  }
 </script>
 
 <div class="flex flex-col h-full max-w-full">
   <header
-    class="absolute top-0 left-0 right-0 bg-surface-700 bg-opacity-30 backdrop-blur-md py-2 px-4 z-10 flex items-center gap-3"
+    class="absolute h-12 top-0 left-0 right-0 bg-surface-700 bg-opacity-30 backdrop-blur-md py-2 px-4 z-10 flex items-center gap-3"
   >
     <div class="flex items-center shrink-0">
       <button on:click={handleBackClick} type="button" class="btn p-0 text-lg"
@@ -66,7 +86,9 @@
       {$currentConversation?.title || "New conversation"}
     </div>
     <div class="flex items-center shrink-0">
-      <ModelSelector bind:comboboxValue />
+      {#if showModelSelector}
+        <ModelSelector bind:comboboxValue />
+      {/if}
     </div>
   </header>
   <div
@@ -77,5 +99,11 @@
       <MessageView {message} />
     {/each}
   </div>
-  <ChatInput on:message={handleUserMessage} />
+  {#if $messageIncoming === "true"}
+    <div class="w-full mt-2">
+      <ProgressBar meter="variant-filled-tertiary" />
+    </div>
+  {:else}
+    <ChatInput on:message={handleUserMessage} />
+  {/if}
 </div>

@@ -7,6 +7,7 @@ from langchain_anthropic.chat_models import ChatAnthropic
 from langchain_google_genai.chat_models import ChatGoogleGenerativeAI
 import models
 import schemas
+from services.websocket_manager import websocket_manager
 
 config = toml.load("../settings.toml")
 
@@ -46,6 +47,8 @@ async def process_message(
 
     try:
         ai_message = ""
+        streaming_metadata = {}
+
         async for chunk in chat_model.astream(context):
             if chunk.content:
                 ai_message += chunk.content
@@ -62,12 +65,23 @@ async def process_message(
                     "id": ai_message_id,
                     "role": "assistant",
                     "content": [{"type": "text", "text": chunk.content}],
+                    "status": "incomplete",
                     "conversation_id": conversation.id,
                     "meta_data": streaming_metadata,
                 }
                 yield chunk_to_send
 
-        # Add the complete message to the versions list in the final metadata
+        completion_message = {
+            "id": ai_message_id,
+            "role": "assistant",
+            "content": [{"type": "text", "text": ai_message}],
+            "status": "complete",
+            "conversation_id": conversation.id,
+            "meta_data": streaming_metadata,
+        }
+
+        await websocket_manager.send_message(completion_message)
+
         metadata["versions"].insert(
             0,
             {

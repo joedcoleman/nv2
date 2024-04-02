@@ -31,6 +31,7 @@ class Message(Base):
     content = Column(JSON)
     role = Column(String)
     conversation_id = Column(String, ForeignKey("conversations.id"))
+    status = Column(String, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     meta_data = Column(JSON, nullable=True)
 

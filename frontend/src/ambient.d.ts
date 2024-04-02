@@ -4,6 +4,7 @@ type Message = {
     id: string;
     role: MessageRole;
     content: any[];
+    status?: string;
     conversation_id: string;
     created_at?: string;
     meta_data: Record<string, any>;

@@ -8,6 +8,7 @@ class MessageBase(BaseModel):
     id: str
     content: List
     role: str
+    status: Optional[str] = None
     conversation_id: str
     meta_data: Optional[dict] = {}
 

@@ -5,6 +5,7 @@
   import type { PopupSettings } from "@skeletonlabs/skeleton";
   import { ListBox, ListBoxItem } from "@skeletonlabs/skeleton";
   import GridiconsDropdown from "~icons/gridicons/dropdown";
+  import { afterUpdate, onDestroy, onMount } from "svelte";
 
   export let comboboxValue = "";
 
@@ -14,6 +15,18 @@
     placement: "bottom",
     closeQuery: ".listbox-item",
   };
+
+  onMount(() => {
+    console.log("Mounted!");
+  });
+
+  afterUpdate(() => {
+    console.log("Updated!");
+  });
+
+  onDestroy(() => {
+    console.log("Destroyed!");
+  });
 </script>
 
 {#if $appSettings}

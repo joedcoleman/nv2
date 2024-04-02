@@ -8,8 +8,10 @@ function createWebSocketStore(url: string) {
     let socket: WebSocket | null = null;
     let subscribers = 0;
     let messageBuffer: any[] = [];
-    let reconnectDelay = 1000; // Delay between reconnection attempts (in milliseconds)
+    let reconnectDelay = 1000;
     let reconnectTimer: any = null;
+    let responseTimeoutTimer: any = null;
+    const responseTimeoutDuration = 5000;
 
     const { subscribe, set } = writable<WebSocket | null>(null, () => {
         subscribers++;
@@ -27,18 +29,31 @@ function createWebSocketStore(url: string) {
         socket.onopen = () => {
             console.log("WebSocket Connected");
             isConnected.set(true);
-            clearTimeout(reconnectTimer); // Clear the reconnect timer on successful connection
+            clearTimeout(reconnectTimer);
         };
 
         socket.onclose = (event) => {
             console.log("WebSocket Disconnected");
             isConnected.set(false);
             if (!event.wasClean) {
-                reconnect(); // Attempt to reconnect if the connection was closed unexpectedly
+                reconnect();
             }
         };
         socket.onmessage = (event) => {
+            clearTimeout(responseTimeoutTimer);
+            responseTimeoutTimer = setTimeout(() => {
+                messageIncoming.set("error");
+                console.error("Timeout: No complete response received from LLM within the expected time.");
+            }, responseTimeoutDuration);
+
             const newChunk = JSON.parse(event.data);
+            
+            if (newChunk.status === "complete") {
+                clearTimeout(responseTimeoutTimer);
+                messageIncoming.set("false");
+                return;
+            }
+
             isSelecting.subscribe((selecting) => {
                 if (selecting) {
                     messageBuffer.push(newChunk);
@@ -51,6 +66,7 @@ function createWebSocketStore(url: string) {
                 }
             })();
         };
+
         set(socket);
     }
 
@@ -73,6 +89,16 @@ function createWebSocketStore(url: string) {
     function sendMessage(message: any) {
         if (socket && socket.readyState === WebSocket.OPEN) {
             socket.send(JSON.stringify(message));
+            
+            // Flag message as incoming and reset timeout
+            messageIncoming.set("true");
+            clearTimeout(responseTimeoutTimer);
+            
+            responseTimeoutTimer = setTimeout(() => {
+                messageIncoming.set("error");
+                console.error("Timeout: No response received from LLM.");
+            }, responseTimeoutDuration);
+
             if (message.role != 'command') {
                 conversations.addMessage(message);
             }
@@ -80,6 +106,7 @@ function createWebSocketStore(url: string) {
             console.error("WebSocket is not connected.");
         }
     }
+
 
     return {
         subscribe,
@@ -89,5 +116,7 @@ function createWebSocketStore(url: string) {
 }
 
 export const webSocketStore = createWebSocketStore(import.meta.env.VITE_WS_URL);
+
+export const messageIncoming = writable("false");
 
 export const isSelecting = writable(false);
