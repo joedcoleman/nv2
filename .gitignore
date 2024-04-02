@@ -18,7 +18,9 @@ node_modules
 # misc
 .DS_Store
 .env
-!.env.docker
+.env.docker
+
+docker-compose.do.yml
 
 npm-debug.log*
 yarn-debug.log*
