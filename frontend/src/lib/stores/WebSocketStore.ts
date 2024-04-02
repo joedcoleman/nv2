@@ -88,6 +88,6 @@ function createWebSocketStore(url: string) {
     };
 }
 
-export const webSocketStore = createWebSocketStore("ws://localhost:8000/ws");
+export const webSocketStore = createWebSocketStore(import.meta.env.VITE_WS_URL);
 
 export const isSelecting = writable(false);
