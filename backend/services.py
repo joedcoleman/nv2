@@ -216,7 +216,7 @@ def generate_title(conversation_id: int, db: Session):
     if conversation.title or len(conversation.messages) < 2:
         return
 
-    system_message = "You will be given the first few messages of a conversation that has taken place between a large language model and a user. Your job is to analyze the content of the messages and return a short title for the conversation. The title should be no more than 5-7 words. If the content in the messages is generic (for example, an exchange of greetings with no real substance), just return an empty string for the title.\n\nYour response must be a valid json object with a 'title' key and your chosen title for the value."
+    system_message = "You will be given the first few messages of a conversation that has taken place between a large language model and a user. Your job is to analyze the content of the messages and return a short title for the conversation. The title should be *no more* than 6 words--keep it succinct! If the content in the messages is generic (for example, an exchange of greetings with no real substance), just return an empty string for the title.\n\nYour response must be a valid json object with a 'title' key and your chosen title for the value."
     user_message = "Here's the conversation to analyze: \n\n"
 
     for message in conversation.messages:
