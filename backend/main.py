@@ -1,8 +1,10 @@
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
 from contextlib import asynccontextmanager
 
+from middleware import auth_middleware
 from routes import router as router
 from database import setup_db
 
@@ -14,6 +16,8 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+
+app.add_middleware(BaseHTTPMiddleware, dispatch=auth_middleware)
 
 app.add_middleware(
     CORSMiddleware,

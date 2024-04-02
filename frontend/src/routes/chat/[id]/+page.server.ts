@@ -1,13 +1,15 @@
-// +page.server.ts
+import type { Actions, PageServerLoad } from './$types';
 
-import type { PageLoad } from './$types';
-
-export const load: PageLoad = async ({ params, fetch }) => {
+export const load: PageServerLoad = async ({ fetch, cookies, params }) => {
+  const authToken = cookies.get('auth_token');
   const conversationId = params.id;
 
   try {
-    // Fetch the conversation from the API using the provided fetch function
-    const response = await fetch(`http://localhost:8000/conversations/${conversationId}`);
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/conversations/${conversationId}`, {
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    })
 
     if (response.ok) {
       const conversation = (await response.json()) as Conversation;

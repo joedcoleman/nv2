@@ -1,0 +1,10 @@
+fastapi==0.110.0
+langchain==0.1.12
+langchain-anthropic==0.1.4
+langchain-google-genai==1.0.1
+langchain-openai==0.0.8
+pytz==2024.1
+SQLAlchemy-Utils==0.41.2
+toml==0.10.2
+uvicorn==0.28.0
+websockets==12.0

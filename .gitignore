@@ -1,4 +1,5 @@
 settings.toml
+db.sqlite3
 
 # dependencies
 /node_modules

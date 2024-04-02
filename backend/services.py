@@ -152,25 +152,25 @@ def _get_chat_model(settings: dict):
         case "Claude Opus":
             llm = ChatAnthropic(
                 model="claude-3-opus-20240229",
-                api_key=config["api_keys"]["ANTHROPIC_API_KEY"],
+                anthropic_api_key=config["api_keys"]["ANTHROPIC_API_KEY"],
                 **kwargs,
             )
         case "Claude Haiku":
             llm = ChatAnthropic(
                 model="claude-3-haiku-20240307",
-                api_key=config["api_keys"]["ANTHROPIC_API_KEY"],
+                anthropic_api_key=config["api_keys"]["ANTHROPIC_API_KEY"],
                 **kwargs,
             )
         case "Claude Sonnet":
             llm = ChatAnthropic(
                 model="claude-3-sonnet-20240229",
-                api_key=config["api_keys"]["ANTHROPIC_API_KEY"],
+                anthropic_api_key=config["api_keys"]["ANTHROPIC_API_KEY"],
                 **kwargs,
             )
         case "Gemini Pro":
             llm = ChatGoogleGenerativeAI(
                 model="gemini-pro",
-                api_key=config["api_keys"]["GOOGLE_API_KEY"],
+                google_api_key=config["api_keys"]["GOOGLE_API_KEY"],
                 convert_system_message_to_human=True,
                 **kwargs,
             )
@@ -215,7 +215,7 @@ def generate_title(conversation_id: int, db: Session):
     if conversation.title or len(conversation.messages) < 2:
         return
 
-    system_message = "You will be given the first few messages of a conversation that has taken place between a large language model and a user. Your job is to analyze the content of the messages and return a short, descriptive title for the conversation. If the content in the messages is generic (for example, an exchange of greetings with no real substance), just return an empty string for the title.\n\nYour response must be a valid json object with a 'title' key and your chosen title for the value."
+    system_message = "You will be given the first few messages of a conversation that has taken place between a large language model and a user. Your job is to analyze the content of the messages and return a short title for the conversation. The title should be no more than 5-7 words. If the content in the messages is generic (for example, an exchange of greetings with no real substance), just return an empty string for the title.\n\nYour response must be a valid json object with a 'title' key and your chosen title for the value."
     user_message = "Here's the conversation to analyze: \n\n"
 
     for message in conversation.messages:
@@ -228,7 +228,6 @@ def generate_title(conversation_id: int, db: Session):
     result = chain.invoke([("system", system_message), ("user", user_message)])
 
     if "title" in result and result["title"]:
-        print(result["title"])
         return result["title"]
 
 

@@ -5,3 +5,8 @@ models = ["GPT-4", "GPT-4-Vision", "Claude Opus", "Claude Haiku", "Gemini Pro"]
 OPENAI_API_KEY = ""
 ANTHROPIC_API_KEY = ""
 GOOGLE_API_KEY = ""
+
+[auth]
+username = ""
+password = ""
+token = ""

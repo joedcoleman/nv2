@@ -20,8 +20,6 @@
     currentConversation.set(null);
     appSettings.set(data.settings.settings);
     conversationList.set(data.conversations);
-
-    console.log($appSettings);
   });
 
   function handleUserMessage(event: CustomEvent<Message>) {

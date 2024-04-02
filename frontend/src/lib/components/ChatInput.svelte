@@ -122,6 +122,7 @@
         id="prompt"
         placeholder="Write a message..."
         rows={$currentConversation ? 1 : 4}
+        spellcheck="false"
         on:input={adjustTextareaHeight}
         on:keydown={handleKeyDown}
       />

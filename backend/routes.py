@@ -1,6 +1,7 @@
 from typing import List
 import toml
-from fastapi import APIRouter, WebSocket, Depends, HTTPException
+from fastapi import APIRouter, WebSocket, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from services import process_message
 from database import get_db
@@ -10,6 +11,8 @@ import services
 router = APIRouter()
 
 connected_websockets: List[WebSocket] = []
+
+config = toml.load("../settings.toml")
 
 
 @router.websocket("/ws")
@@ -41,5 +44,19 @@ def get_conversations(db: Session = Depends(get_db)):
 
 @router.get("/settings", response_model=schemas.Settings)
 def get_settings():
-    config = toml.load("../settings.toml")
     return config
+
+
+@router.post("/auth")
+def auth(form_data: OAuth2PasswordRequestForm = Depends()):
+    username = form_data.username
+    password = form_data.password
+
+    # Very simple auth check..
+    if username != config["auth"]["username"] or password != config["auth"]["password"]:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+        )
+
+    return {"token": config["auth"]["token"]}
