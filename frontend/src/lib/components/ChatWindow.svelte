@@ -1,18 +1,17 @@
 <script lang="ts">
   import { ProgressBar } from "@skeletonlabs/skeleton";
-  import { Toast, getToastStore } from "@skeletonlabs/skeleton";
-  import type { ToastSettings, ToastStore } from "@skeletonlabs/skeleton";
+  import { getToastStore } from "@skeletonlabs/skeleton";
+  import type { ToastSettings } from "@skeletonlabs/skeleton";
   import { beforeUpdate, afterUpdate, onMount, tick } from "svelte";
   import { goto } from "$app/navigation";
   import { page } from "$app/stores";
   import { currentConversation } from "$lib/stores/ConversationStore";
   import { webSocketStore, messageIncoming } from "$lib/stores/WebSocketStore";
-  import { currentModel } from "$lib/stores/SettingsStore";
   import { scrollToBottom } from "$lib/actions/scrollToBottom";
   import ChatInput from "$lib/components/ChatInput.svelte";
   import MessageView from "$lib/components/MessageView.svelte";
   import PajamasGoBack from "~icons/pajamas/go-back";
-  import ModelSelector from "$lib/components/common/ModelSelector.svelte";
+  import ModelSelector from "./common/ModelSelector.svelte";
 
   const toastStore = getToastStore();
 
@@ -23,14 +22,6 @@
   let chatWindow: HTMLElement;
   let autoscroll: boolean;
   const threshold = 50;
-
-  let showModelSelector = false;
-
-  onMount(() => {
-    setTimeout(() => {
-      showModelSelector = true;
-    }, 500);
-  });
 
   beforeUpdate(() => {
     autoscroll =
@@ -60,9 +51,6 @@
     }
   }
 
-  $: comboboxValue = $currentModel;
-  $: currentModel.set(comboboxValue);
-
   $: if ($messageIncoming === "error") {
     const t: ToastSettings = {
       message: "Chat model not responding. Try again in a moment.",
@@ -85,11 +73,7 @@
     <div class="flex grow items-center truncate">
       {$currentConversation?.title || "New conversation"}
     </div>
-    <div class="flex items-center shrink-0">
-      {#if showModelSelector}
-        <ModelSelector bind:comboboxValue />
-      {/if}
-    </div>
+    <ModelSelector index="chat-window" />
   </header>
   <div
     class="flex flex-col overflow-y-auto gap-3 p-4 grow leading-7 pt-14"
@@ -101,7 +85,7 @@
   </div>
   {#if $messageIncoming === "true"}
     <div class="w-full mt-2">
-      <ProgressBar meter="variant-filled-tertiary" />
+      <ProgressBar meter="variant-soft-tertiary" />
     </div>
   {:else}
     <ChatInput on:message={handleUserMessage} />

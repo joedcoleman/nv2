@@ -1,3 +1,5 @@
+import type internal from "stream";
+
 type MessageRole = 'user' | 'assistant' | 'system' | 'command';
 
 type Message = {
@@ -20,7 +22,11 @@ type Conversation = {
 }
 
 type Settings = {
-  models: []
+  models: string[],
+  currentModel: string,
+  customInstructions: string,
+  maxTokens: int,
+  temperature: int
 }
 
 let conversations: Conversation[] = []

@@ -42,7 +42,7 @@ def get_conversations(db: Session = Depends(get_db)):
 
 @router.get("/settings", response_model=schemas.Settings)
 def get_settings():
-    return config
+    return config["settings"]
 
 
 @router.post("/auth")

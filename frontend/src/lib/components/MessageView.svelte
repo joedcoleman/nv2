@@ -13,12 +13,12 @@
   import AnthropicIcon from "./common/AnthropicIcon.svelte";
   import TablerBrandGoogleFilled from "~icons/tabler/brand-google-filled";
   import { isSelecting } from "$lib/stores/WebSocketStore";
-  import { currentModel } from "$lib/stores/SettingsStore";
   import { currentConversation } from "$lib/stores/ConversationStore";
   import { webSocketStore } from "$lib/stores/WebSocketStore";
   import MingcuteRightLine from "~icons/mingcute/right-line";
   import MingcuteLeftLine from "~icons/mingcute/left-line";
   import DOMPurify from "dompurify";
+  import { appSettings } from "$lib/stores/SettingsStore";
 
   export let message: Message;
 
@@ -102,7 +102,7 @@
 
   function regenerateMessage() {
     message.content = [{ type: "text", text: "" }];
-    message.meta_data.llm.model = $currentModel;
+    message.meta_data.llm.model = $appSettings.currentModel;
 
     webSocketStore.sendMessage({
       id: crypto.randomUUID(),
@@ -110,7 +110,7 @@
       content: "regenerate",
       conversation_id: $currentConversation?.id || crypto.randomUUID(),
       meta_data: {
-        llm: { model: $currentModel },
+        llm: { model: $appSettings.currentModel },
         message_to_regenerate: message.id,
       },
     });

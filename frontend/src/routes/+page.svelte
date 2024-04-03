@@ -1,33 +1,21 @@
 <script lang="ts">
-  import type { PageData } from "./$types";
   import { onMount } from "svelte";
   import { fade, fly } from "svelte/transition";
   import { webSocketStore, isConnected } from "$lib/stores/WebSocketStore";
-  import { appSettings, currentModel } from "$lib/stores/SettingsStore";
-  import {
-    currentConversation,
-    currentMessage,
-    conversationList,
-  } from "$lib/stores/ConversationStore";
+  import { currentConversation } from "$lib/stores/ConversationStore";
   import ChatInput from "$lib/components/ChatInput.svelte";
   import Conversations from "$lib/components/Conversations.svelte";
   import ChatWindow from "$lib/components/ChatWindow.svelte";
   import ModelSelector from "$lib/components/common/ModelSelector.svelte";
 
-  export let data: PageData;
-
   onMount(() => {
     currentConversation.set(null);
-    appSettings.set(data.settings.settings);
-    conversationList.set(data.conversations);
   });
 
   function handleUserMessage(event: CustomEvent<Message>) {
     const message = event.detail;
     webSocketStore.sendMessage(message);
   }
-  $: comboboxValue = $currentModel;
-  $: currentModel.set(comboboxValue);
 </script>
 
 {#if $currentConversation}
@@ -54,7 +42,7 @@
           </div>
         </button>
       </div>
-      <ModelSelector bind:comboboxValue />
+      <ModelSelector index="home" />
     </div>
     <ChatInput on:message={handleUserMessage} />
     <Conversations />

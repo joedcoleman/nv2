@@ -1,6 +1,6 @@
-import type { PageServerLoad } from './$types';
+import type { LayoutServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ fetch, cookies }) => {
+export const load: LayoutServerLoad = async ({ fetch, cookies }) => {
   const authToken = cookies.get('auth_token');
 
   const [conversationsResponse, settingsResponse] = await Promise.all([
@@ -18,8 +18,6 @@ export const load: PageServerLoad = async ({ fetch, cookies }) => {
 
   const conversations = await conversationsResponse.json();
   const settings = await settingsResponse.json();
-
-  console.log("Returning settings: ", settings)
   
   return {
     conversations,

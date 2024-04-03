@@ -1,20 +1,6 @@
-import { writable } from 'svelte/store';
+import type {Writable} from 'svelte/store';
+import { localStorageStore } from '@skeletonlabs/skeleton';
 
-export const appSettings = writable<Settings>()
+let initialSettings = { models: ['GPT-4', 'Claude Haiku'], currentModel: 'GPT-4', customInstructions: 'You are a helpful assistant.', maxTokens: 5000, temperature: 70 }
 
-const isBrowser = typeof window !== 'undefined';
-
-let initialValue = 'Claude Haiku';
-
-if (isBrowser && localStorage.getItem('currentModel')) {
-  initialValue = localStorage.getItem('currentModel') as string;
-}
-
-export const currentModel = writable<string>(initialValue);
-
-if (isBrowser) {
-  currentModel.subscribe(value => {
-    localStorage.setItem('currentModel', value);
-  });
-}
-
+export const appSettings: Writable<Settings> = localStorageStore('appSettings', initialSettings);

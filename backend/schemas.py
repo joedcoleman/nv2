@@ -41,4 +41,4 @@ class ConversationOut(ConversationBase):
 
 
 class Settings(BaseModel):
-    settings: dict
+    models: List[str]

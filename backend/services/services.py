@@ -137,13 +137,17 @@ async def process_message(
 def _get_chat_model(settings: dict):
     model = settings["model"]
     max_tokens = settings.get("max_tokens", None)
+    temperature = settings.get("temperature", None)
 
-    # Create a dictionary to store the keyword arguments
     kwargs = {}
 
-    # Add max_tokens to kwargs only if it's not None
     if max_tokens is not None:
         kwargs["max_tokens"] = max_tokens
+
+    if temperature is not None:
+        kwargs["temperature"] = temperature / 100
+
+    print(kwargs)
 
     llm = None
 
@@ -207,19 +211,27 @@ def generate_context(
             return [item for item in content if item["type"] != "image_url"]
         return content
 
+    context = []
+
+    system_message = message_dict["meta_data"]["llm"].get("instructions", None)
+
+    if system_message:
+        context.append(("system", system_message))
+
     if from_message_id:
-        context = []
         for message in conversation.messages:
             if message.id == from_message_id:
                 break
             context.append((message.role, filter_content(message.content)))
         return context
     else:
-        context = [
+        context += [
             (message.role, filter_content(message.content))
             for message in conversation.messages
         ]
         context.append(("user", filter_content(message_dict["content"])))
+
+        print("Returning context: ", context)
 
         return context
 

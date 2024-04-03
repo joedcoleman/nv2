@@ -1,6 +1,7 @@
 <script lang="ts">
   let username = "";
   let password = "";
+  let showError = false;
 
   async function handleLogin(event: SubmitEvent) {
     event.preventDefault(); // Prevent page reload
@@ -21,12 +22,13 @@
       document.cookie = `auth_token=${token}; path=/`;
       window.location.href = "/";
     } else {
+      showError = true;
       console.error("Login failed");
     }
   }
 </script>
 
-<div class="flex items-center justify-center min-h-screen">
+<div class="flex flex-col items-center justify-start min-h-screen mt-16">
   <div class="w-full max-w-xs">
     <form
       on:submit={handleLogin}
@@ -63,4 +65,7 @@
       </div>
     </form>
   </div>
+  {#if showError}
+    <div class="mt-2">Incorrect username or password!</div>
+  {/if}
 </div>

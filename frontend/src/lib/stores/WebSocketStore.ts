@@ -11,7 +11,7 @@ function createWebSocketStore(url: string) {
     let reconnectDelay = 1000;
     let reconnectTimer: any = null;
     let responseTimeoutTimer: any = null;
-    const responseTimeoutDuration = 5000;
+    const responseTimeoutDuration = 10000;
 
     const { subscribe, set } = writable<WebSocket | null>(null, () => {
         subscribers++;
