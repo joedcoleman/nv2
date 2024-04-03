@@ -17,7 +17,6 @@
   import { webSocketStore } from "$lib/stores/WebSocketStore";
   import MingcuteRightLine from "~icons/mingcute/right-line";
   import MingcuteLeftLine from "~icons/mingcute/left-line";
-  import DOMPurify from "dompurify";
   import { appSettings } from "$lib/stores/SettingsStore";
 
   export let message: Message;
@@ -57,7 +56,7 @@
 
     content.forEach((item) => {
       if (item.type === "text") {
-        const sanitizedContent = DOMPurify.sanitize(md.render(item.text));
+        const sanitizedContent = md.render(item.text);
         renderedContent += sanitizedContent;
       } else if (item.type === "image_url") {
         renderedContent += `<img src="${item.image_url.url}" alt="Image" class="max-w-44 rounded-md">`;
