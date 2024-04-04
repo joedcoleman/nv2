@@ -19,8 +19,8 @@
 </script>
 
 {#if $conversationList}
-  <div class="text-center w-full mt-12">
-    <div class="text-surface-300 mb-6 text-lg">Recent chats</div>
+  <div class="text-surface-300 mb-6 text-lg mt-10">Recent chats</div>
+  <div class="text-center w-full h-full overflow-y-scroll">
     <ul class="space-y-4 px-2">
       {#each $conversationList
         .sort((a, b) => {

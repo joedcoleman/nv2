@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { onMount, afterUpdate } from "svelte";
   import { fade } from "svelte/transition";
   import { clipboard, getToastStore } from "@skeletonlabs/skeleton";
   import type { ToastSettings } from "@skeletonlabs/skeleton";
@@ -24,6 +24,7 @@
   const toastStore = getToastStore();
 
   function handleCopy() {
+    console.log("Handling copy!");
     const t: ToastSettings = {
       message: "Message copied!",
       hideDismiss: true,
@@ -70,11 +71,20 @@
   $: role = message.role;
 
   onMount(() => {
+    addCopyButtonListeners();
+  });
+
+  afterUpdate(() => {
+    addCopyButtonListeners();
+  });
+
+  function addCopyButtonListeners() {
     const copyButtons = document.querySelectorAll(".copy-button");
     copyButtons.forEach((button) => {
+      button.removeEventListener("click", handleCopyClick);
       button.addEventListener("click", handleCopyClick);
     });
-  });
+  }
 
   function handleCopyClick(event: Event) {
     const button = event.target as HTMLButtonElement;
@@ -202,7 +212,7 @@
         </div>
       </div>
     {/if}
-    <div class="prose prose-invert">
+    <div class="prose prose-invert max-w-2xl">
       {@html processedContent}
     </div>
   </div>

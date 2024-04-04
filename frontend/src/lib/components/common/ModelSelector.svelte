@@ -27,7 +27,7 @@
   <span><GridiconsDropdown /></span>
 </button>
 <div
-  class="card variant-glass w-48 shadow-xl py-2 z-30 text-sm"
+  class="card bg-surface-300 w-48 shadow-xl py-2 z-30 text-sm"
   data-popup="popupCombobox{index}"
 >
   <ListBox rounded="rounded-none">

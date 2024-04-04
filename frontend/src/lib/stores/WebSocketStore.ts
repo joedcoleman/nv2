@@ -8,7 +8,7 @@ function createWebSocketStore(url: string) {
     let socket: WebSocket | null = null;
     let subscribers = 0;
     let messageBuffer: any[] = [];
-    let reconnectDelay = 1000;
+    let reconnectDelay = 2000;
     let reconnectTimer: any = null;
     let responseTimeoutTimer: any = null;
     const responseTimeoutDuration = 10000;
@@ -82,7 +82,6 @@ function createWebSocketStore(url: string) {
         if (!socket || socket.readyState === WebSocket.CLOSED) {
             console.log(`Attempting to reconnect in ${reconnectDelay}ms...`);
             reconnectTimer = setTimeout(connect, reconnectDelay);
-            reconnectDelay *= 2;
         }
     }
 
