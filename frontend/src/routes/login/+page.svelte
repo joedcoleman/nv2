@@ -19,7 +19,9 @@
 
     if (response.ok) {
       const { token } = await response.json();
-      document.cookie = `auth_token=${token}; path=/`;
+      let expiryDate = new Date();
+      expiryDate.setFullYear(expiryDate.getFullYear() + 10);
+      document.cookie = `auth_token=${token}; expires=${expiryDate.toUTCString()}; path=/`;
       window.location.href = "/";
     } else {
       showError = true;
