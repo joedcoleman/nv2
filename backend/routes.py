@@ -24,7 +24,7 @@ async def websocket_endpoint(websocket: WebSocket, db: Session = Depends(get_db)
             async for chunk in services.process_message(db, message):
                 await websocket_manager.send_message(chunk)
     except Exception as e:
-        print(f"Error: {e}")
+        pass
 
 
 @router.get("/conversations/{conversation_id}", response_model=schemas.ConversationOut)
@@ -50,7 +50,6 @@ def auth(form_data: OAuth2PasswordRequestForm = Depends()):
     username = form_data.username
     password = form_data.password
 
-    # Very simple auth check..
     if username != config["auth"]["username"] or password != config["auth"]["password"]:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

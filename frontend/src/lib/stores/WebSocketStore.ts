@@ -1,6 +1,6 @@
 // src/lib/stores/WebSocketStore.ts
-import { writable, derived } from 'svelte/store';
-import { conversations } from "$lib/stores/ConversationStore";
+import { writable, derived, get } from 'svelte/store';
+import { conversations, currentMessage, previousMessage } from "$lib/stores/ConversationStore";
 
 export const isConnected = writable(false);
 

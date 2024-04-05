@@ -107,3 +107,5 @@ export const conversationList = writable<Conversation[]>([]);
 export const currentConversation = writable<Conversation | null>(null);
 
 export const currentMessage = writable("");
+
+export const previousMessage = writable("");

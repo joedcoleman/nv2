@@ -5,6 +5,7 @@
   import {
     currentConversation,
     currentMessage,
+    previousMessage,
   } from "$lib/stores/ConversationStore";
   import { v4 as uuidv4 } from "uuid";
   import { appSettings } from "$lib/stores/SettingsStore";
@@ -87,6 +88,8 @@
           text: $currentMessage.trim(),
         });
       }
+
+      previousMessage.set($currentMessage);
 
       dispatch("message", newMessage);
       $currentMessage = "";

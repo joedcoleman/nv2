@@ -5,7 +5,11 @@
   import { beforeUpdate, afterUpdate, onMount, tick } from "svelte";
   import { goto } from "$app/navigation";
   import { page } from "$app/stores";
-  import { currentConversation } from "$lib/stores/ConversationStore";
+  import {
+    currentConversation,
+    currentMessage,
+    previousMessage,
+  } from "$lib/stores/ConversationStore";
   import { webSocketStore, messageIncoming } from "$lib/stores/WebSocketStore";
   import { scrollToBottom } from "$lib/actions/scrollToBottom";
   import ChatInput from "$lib/components/ChatInput.svelte";
@@ -58,6 +62,7 @@
     };
     toastStore.trigger(t);
     messageIncoming.set("false");
+    currentMessage.set($previousMessage);
   }
 </script>
 

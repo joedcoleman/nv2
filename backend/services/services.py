@@ -138,7 +138,7 @@ def _get_chat_model(settings: dict):
     model = settings["model"]
     max_tokens = settings.get("max_tokens", None)
     temperature = settings.get("temperature", None)
-
+    request_timeout = 10
     kwargs = {}
 
     if max_tokens is not None:
@@ -147,43 +147,49 @@ def _get_chat_model(settings: dict):
     if temperature is not None:
         kwargs["temperature"] = temperature / 100
 
-    print(kwargs)
-
     llm = None
 
     match model:
         case "GPT-4":
             llm = ChatOpenAI(
-                model="gpt-4", api_key=config["api_keys"]["OPENAI_API_KEY"], **kwargs
+                model="gpt-4",
+                api_key=config["api_keys"]["OPENAI_API_KEY"],
+                request_timeout=request_timeout,
+                **kwargs,
             )
         case "GPT-4-Turbo":
             llm = ChatOpenAI(
                 model="gpt-4-turbo-preview",
                 api_key=config["api_keys"]["OPENAI_API_KEY"],
+                request_timeout=request_timeout,
                 **kwargs,
             )
         case "GPT-4-Vision":
             llm = ChatOpenAI(
                 model="gpt-4-vision-preview",
                 api_key=config["api_keys"]["OPENAI_API_KEY"],
+                request_timeout=request_timeout,
                 **kwargs,
             )
         case "Claude Opus":
             llm = ChatAnthropic(
                 model="claude-3-opus-20240229",
                 anthropic_api_key=config["api_keys"]["ANTHROPIC_API_KEY"],
+                default_request_timeout=request_timeout,
                 **kwargs,
             )
         case "Claude Haiku":
             llm = ChatAnthropic(
                 model="claude-3-haiku-20240307",
                 anthropic_api_key=config["api_keys"]["ANTHROPIC_API_KEY"],
+                default_request_timeout=request_timeout,
                 **kwargs,
             )
         case "Claude Sonnet":
             llm = ChatAnthropic(
                 model="claude-3-sonnet-20240229",
                 anthropic_api_key=config["api_keys"]["ANTHROPIC_API_KEY"],
+                default_request_timeout=request_timeout,
                 **kwargs,
             )
         case "Gemini Pro":
@@ -230,8 +236,6 @@ def generate_context(
             for message in conversation.messages
         ]
         context.append(("user", filter_content(message_dict["content"])))
-
-        print("Returning context: ", context)
 
         return context
 
