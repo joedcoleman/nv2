@@ -1,6 +1,7 @@
 // src/lib/stores/WebSocketStore.ts
 import { writable, derived, get } from 'svelte/store';
 import { conversations, currentMessage, previousMessage } from "$lib/stores/ConversationStore";
+import { notificationStore } from './NotificationStore';
 
 export const isConnected = writable(false);
 
@@ -35,18 +36,29 @@ function createWebSocketStore(url: string) {
         socket.onclose = (event) => {
             console.log("WebSocket Disconnected");
             isConnected.set(false);
-            if (!event.wasClean) {
-                reconnect();
-            }
+            reconnect();
         };
         socket.onmessage = (event) => {
             clearTimeout(responseTimeoutTimer);
             responseTimeoutTimer = setTimeout(() => {
-                messageIncoming.set("error");
-                console.error("Timeout: No complete response received from LLM within the expected time.");
+                notificationStore.set({
+                    message: "Waiting for chat model..",
+                    type: "warning",
+                });
             }, responseTimeoutDuration);
 
             const newChunk = JSON.parse(event.data);
+            
+            if(newChunk.role === "error") {
+                notificationStore.set({
+                    message: newChunk.content[0].text,
+                    type: "error"
+                });
+                messageIncoming.set("false");
+                currentMessage.set(get(previousMessage));
+                clearTimeout(responseTimeoutTimer);
+                return;
+            }
             
             if (newChunk.status === "complete") {
                 clearTimeout(responseTimeoutTimer);
@@ -94,8 +106,10 @@ function createWebSocketStore(url: string) {
             clearTimeout(responseTimeoutTimer);
             
             responseTimeoutTimer = setTimeout(() => {
-                messageIncoming.set("error");
-                console.error("Timeout: No response received from LLM.");
+                notificationStore.set({
+                    message: "Waiting for chat model..",
+                    type: "warning",
+                });                
             }, responseTimeoutDuration);
 
             if (message.role != 'command') {

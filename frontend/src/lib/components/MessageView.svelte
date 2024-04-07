@@ -1,8 +1,7 @@
 <script lang="ts">
   import { onMount, afterUpdate } from "svelte";
   import { fade } from "svelte/transition";
-  import { clipboard, getToastStore } from "@skeletonlabs/skeleton";
-  import type { ToastSettings } from "@skeletonlabs/skeleton";
+  import { clipboard } from "@skeletonlabs/skeleton";
   import MarkdownIt from "markdown-it";
   import markdownItKatex from "markdown-it-katex";
   import hljs from "highlight.js";
@@ -18,21 +17,21 @@
   import MingcuteRightLine from "~icons/mingcute/right-line";
   import MingcuteLeftLine from "~icons/mingcute/left-line";
   import { appSettings } from "$lib/stores/SettingsStore";
+  import { notificationStore } from "$lib/stores/NotificationStore";
 
   export let message: Message;
 
-  const toastStore = getToastStore();
-
   function handleCopy() {
     console.log("Handling copy!");
-    const t: ToastSettings = {
+    notificationStore.set({
       message: "Message copied!",
-      hideDismiss: true,
-      timeout: 2000,
-      background: "bg-tertiary-500/70",
-      classes: "backdrop-blur-sm",
-    };
-    toastStore.trigger(t);
+      type: "info",
+      settings: {
+        hideDismiss: true,
+        timeout: 2000,
+        classes: "backdrop-blur-sm",
+      },
+    });
   }
 
   const md = new MarkdownIt({
@@ -90,14 +89,15 @@
     const button = event.target as HTMLButtonElement;
     const code = atob(button.dataset.code!);
     navigator.clipboard.writeText(code).then(() => {
-      const t: ToastSettings = {
+      notificationStore.set({
         message: "Code copied!",
-        hideDismiss: true,
-        timeout: 2000,
-        background: "bg-tertiary-500/70",
-        classes: "backdrop-blur-sm",
-      };
-      toastStore.trigger(t);
+        type: "info",
+        settings: {
+          hideDismiss: true,
+          timeout: 2000,
+          classes: "backdrop-blur-sm",
+        },
+      });
     });
   }
 

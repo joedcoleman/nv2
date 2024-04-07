@@ -10,15 +10,14 @@
   import { v4 as uuidv4 } from "uuid";
   import { appSettings } from "$lib/stores/SettingsStore";
   import { isConnected } from "$lib/stores/WebSocketStore";
-  import { FileButton, getToastStore } from "@skeletonlabs/skeleton";
-  import type { ToastSettings } from "@skeletonlabs/skeleton";
+  import { FileButton } from "@skeletonlabs/skeleton";
   import GridiconsAddImage from "~icons/gridicons/add-image";
   import MingcuteSendPlaneFill from "~icons/mingcute/send-plane-fill";
   import MingcuteArrowsUpFill from "~icons/mingcute/arrows-up-fill";
   import MingcuteArrowsDownFill from "~icons/mingcute/arrows-down-fill";
   import ChatInputDrawer from "./ChatInputDrawer.svelte";
+  import { notificationStore } from "$lib/stores/NotificationStore";
 
-  const toastStore = getToastStore();
   let textareaElement: HTMLTextAreaElement;
   let images: FileList | undefined;
   let thumbnailURL: string | undefined;
@@ -32,7 +31,7 @@
   onMount(() => {
     if (
       !/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-        navigator.userAgent
+        navigator.userAgent,
       )
     ) {
       textareaElement.focus();
@@ -48,11 +47,10 @@
 
   async function sendMessage() {
     if (!$isConnected) {
-      const t: ToastSettings = {
+      notificationStore.set({
         message: "WebSocket not connected. Refresh and try again.",
-        background: "variant-filled-error",
-      };
-      toastStore.trigger(t);
+        type: "error",
+      });
       return;
     }
     if ($currentMessage.trim() !== "" || (images && images?.length > 0)) {
@@ -111,7 +109,7 @@
 
     let currentHeight = parseInt(
       window.getComputedStyle(textareaElement).height,
-      10
+      10,
     );
 
     if (currentHeight > maxHeight) {

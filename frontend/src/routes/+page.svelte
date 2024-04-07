@@ -8,14 +8,14 @@
   import ChatWindow from "$lib/components/ChatWindow.svelte";
   import ModelSelector from "$lib/components/common/ModelSelector.svelte";
 
-  onMount(() => {
-    currentConversation.set(null);
-  });
-
   function handleUserMessage(event: CustomEvent<Message>) {
     const message = event.detail;
     webSocketStore.sendMessage(message);
   }
+
+  onMount(() => {
+    currentConversation.set(null);
+  });
 </script>
 
 {#if $currentConversation}

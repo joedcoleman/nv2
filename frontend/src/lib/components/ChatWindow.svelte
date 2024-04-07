@@ -1,23 +1,15 @@
 <script lang="ts">
   import { ProgressBar } from "@skeletonlabs/skeleton";
-  import { getToastStore } from "@skeletonlabs/skeleton";
-  import type { ToastSettings } from "@skeletonlabs/skeleton";
   import { beforeUpdate, afterUpdate, onMount, tick } from "svelte";
   import { goto } from "$app/navigation";
   import { page } from "$app/stores";
-  import {
-    currentConversation,
-    currentMessage,
-    previousMessage,
-  } from "$lib/stores/ConversationStore";
+  import { currentConversation } from "$lib/stores/ConversationStore";
   import { webSocketStore, messageIncoming } from "$lib/stores/WebSocketStore";
   import { scrollToBottom } from "$lib/actions/scrollToBottom";
   import ChatInput from "$lib/components/ChatInput.svelte";
   import MessageView from "$lib/components/MessageView.svelte";
   import PajamasGoBack from "~icons/pajamas/go-back";
   import ModelSelector from "./common/ModelSelector.svelte";
-
-  const toastStore = getToastStore();
 
   $: currentMessages = $currentConversation?.messages || [];
   $: userSentLastMessage =
@@ -53,16 +45,6 @@
     } else {
       goto("/");
     }
-  }
-
-  $: if ($messageIncoming === "error") {
-    const t: ToastSettings = {
-      message: "Chat model not responding. Try again in a moment.",
-      background: "variant-filled-error",
-    };
-    toastStore.trigger(t);
-    messageIncoming.set("false");
-    currentMessage.set($previousMessage);
   }
 </script>
 

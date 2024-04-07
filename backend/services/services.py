@@ -130,7 +130,16 @@ async def process_message(
         if title:
             update_conversation(conversation.id, {"title": title}, db)
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"Error: {e}", flush=True)
+        error_message = {
+            "id": str(uuid.uuid4()),
+            "role": "error",
+            "content": [{"type": "text", "text": str(e)}],
+            "status": "error",
+            "conversation_id": message["conversation_id"],
+            "meta_data": {},
+        }
+        await websocket_manager.send_message(error_message)
         raise
 
 
@@ -141,8 +150,8 @@ def _get_chat_model(settings: dict):
     request_timeout = 10
     kwargs = {}
 
-    if max_tokens is not None:
-        kwargs["max_tokens"] = max_tokens
+    # if max_tokens is not None:
+    #     kwargs["max_tokens"] = max_tokens
 
     if temperature is not None:
         kwargs["temperature"] = temperature / 100
@@ -210,6 +219,8 @@ def generate_context(
     message_dict: dict,
     from_message_id: schemas.MessageOut = None,
 ):
+    """ This function returns context for the LLM call. TODO: Implement the max_tokens limit found in the message_dict, so that the LLM call does not exceed the limit. """
+
     VISION_MODELS = ["GPT-4-Vision", "Claude Opus", "Claude Sonnet", "Claude Haiku"]
 
     def filter_content(content):
