@@ -140,11 +140,11 @@
 </script>
 
 <div class="flex flex-col p-2 pt-1 w-full">
-  <div class="variant-soft flex rounded-md shadow-sm border-0 ring-0">
+  <div class="variant-soft-secondary flex rounded-md shadow-sm border-0 ring-0">
     {#if $currentConversation}
       <button
         on:click={() => (isDrawerOpen = !isDrawerOpen)}
-        class="inline-flex items-start rounded-l-md px-3 pt-4 variant-soft"
+        class="inline-flex items-start rounded-l-md px-3 pt-4 bg-secondary-900/70 text-secondary-300"
       >
         {#if isDrawerOpen}
           <MingcuteArrowsDownFill />
@@ -156,9 +156,9 @@
     <textarea
       bind:value={$currentMessage}
       bind:this={textareaElement}
-      class="rounded-l-md block variant-glass w-full min-w-0 flex-1 border-0 ring-0 focus:ring-0 focus:border-0 resize-none {$currentConversation
+      class="rounded-l-md block bg-transparent placeholder-secondary-400 w-full min-w-0 flex-1 border-0 ring-0 focus:ring-0 focus:border-0 resize-none {$currentConversation
         ? 'py-3'
-        : 'p-4'}"
+        : 'py-4 pl-5'}"
       name="prompt"
       id="prompt"
       placeholder="Write a message..."
@@ -168,7 +168,9 @@
       on:keydown={handleKeyDown}
     />
     <div
-      class="rounded-r-md h-full variant-glass flex items-start justify-center p-2 gap-2"
+      class="rounded-r-md h-full bg-transparent flex items-start justify-center {$currentConversation
+        ? 'p-2 gap-1.5'
+        : 'p-4 gap-2'}"
     >
       {#if thumbnailURL}
         <div class="relative">
@@ -190,7 +192,7 @@
       {:else}
         <FileButton
           name="image"
-          button="btn-icon btn-icon-sm variant-soft"
+          button="btn-icon btn-icon-sm variant-filled-secondary"
           bind:files={images}
           on:change={() => {
             if (images && images?.length > 0) {
@@ -211,7 +213,7 @@
             easing: quintOut,
           }}
           type="button"
-          class="btn-icon btn-icon-sm flex items-center bg-tertiary-500/50"
+          class="btn-icon btn-icon-sm flex items-center variant-filled-primary"
         >
           <MingcuteSendPlaneFill />
         </button>

@@ -31,7 +31,7 @@ export default {
             enhancements: true,
           },
           {
-            name: "gold-nouveau",
+            name: "crimson",
             enhancements: true,
           },
         ],

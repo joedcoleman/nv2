@@ -21,7 +21,7 @@
 {#if $conversationList}
   <div class="text-surface-300 mb-6 text-lg mt-10">Recent chats</div>
   <div class="text-center w-full h-full overflow-y-scroll">
-    <ul class="space-y-4 px-2">
+    <ul class="divide-y divide-surface-400/40 px-2">
       {#each $conversationList
         .sort((a, b) => {
           const dateA = a.updated_at ? new Date(a.updated_at) : new Date(0);
@@ -32,7 +32,7 @@
         {#if conversation.messages.length > 0 && conversation.messages[conversation.messages.length - 1].content[0].text.trim() !== ""}
           <li
             on:click={() => handleConversationClick(conversation.id)}
-            class="px-4 py-3 rounded cursor-pointer bg-transparent border border-surface-400/40 text-surface-100 hover:bg-secondary-800/5"
+            class="p-4 cursor-pointer bg-transparent text-surface-100 hover:variant-glass-surface"
           >
             <div class="flex-auto truncate max-w-2xl text-left">
               {conversation.title || "New conversation"}
