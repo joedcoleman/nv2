@@ -13,8 +13,8 @@
   import { FileButton } from "@skeletonlabs/skeleton";
   import GridiconsAddImage from "~icons/gridicons/add-image";
   import MingcuteSendPlaneFill from "~icons/mingcute/send-plane-fill";
-  import MingcuteArrowsUpFill from "~icons/mingcute/arrows-up-fill";
-  import MingcuteArrowsDownFill from "~icons/mingcute/arrows-down-fill";
+  import MingcuteArrowsUpLine from "~icons/mingcute/arrows-up-line";
+  import MingcuteArrowsDownLine from "~icons/mingcute/arrows-down-line";
   import ChatInputDrawer from "./ChatInputDrawer.svelte";
   import { notificationStore } from "$lib/stores/NotificationStore";
 
@@ -140,23 +140,27 @@
 </script>
 
 <div class="flex flex-col p-2 pt-1 w-full">
-  <div class="variant-soft-secondary flex rounded-md shadow-sm border-0 ring-0">
+  <div
+    class="flex rounded-md shadow-sm border-0 ring-0 {$currentConversation
+      ? 'bg-tertiary-200/10'
+      : 'variant-soft-secondary'}"
+  >
     {#if $currentConversation}
       <button
         on:click={() => (isDrawerOpen = !isDrawerOpen)}
-        class="inline-flex items-start rounded-l-md px-3 pt-4 bg-secondary-900/70 text-secondary-300"
+        class="inline-flex items-start rounded-l-md pl-3 pr-2.5 py-2 my-2 text-surface-200 border-r border-surface-400/80"
       >
         {#if isDrawerOpen}
-          <MingcuteArrowsDownFill />
+          <MingcuteArrowsDownLine />
         {:else}
-          <MingcuteArrowsUpFill />
+          <MingcuteArrowsUpLine />
         {/if}
       </button>
     {/if}
     <textarea
       bind:value={$currentMessage}
       bind:this={textareaElement}
-      class="rounded-l-md block bg-transparent placeholder-secondary-400 w-full min-w-0 flex-1 border-0 ring-0 focus:ring-0 focus:border-0 resize-none {$currentConversation
+      class="rounded-l-md block bg-transparent placeholder-surface-300 w-full min-w-0 flex-1 border-0 ring-0 focus:ring-0 focus:border-0 resize-none {$currentConversation
         ? 'py-3'
         : 'py-4 pl-5'}"
       name="prompt"

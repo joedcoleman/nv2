@@ -17,9 +17,7 @@
 </script>
 
 <button
-  class="btn btn-sm justify-between px-3 pt-1.5 {$currentConversation
-    ? 'text-[13px] variant-ghost'
-    : 'text-[15px]'}"
+  class="btn btn-sm justify-between px-3 pt-1.5 text-sm"
   use:popup={popupCombobox}
   on:click={() => console.log("Clicked!")}
 >
