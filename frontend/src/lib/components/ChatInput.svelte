@@ -141,9 +141,9 @@
 
 <div class="flex flex-col p-2 pt-1 w-full">
   <div
-    class="flex rounded-md shadow-sm border-0 ring-0 {$currentConversation
-      ? 'bg-tertiary-200/10'
-      : 'variant-soft-secondary'}"
+    class="flex rounded-md shadow-sm ring-0 {$currentConversation
+      ? 'bg-tertiary-200/10 border-0'
+      : 'bg-transparent border border-surface-400'}"
   >
     {#if $currentConversation}
       <button
