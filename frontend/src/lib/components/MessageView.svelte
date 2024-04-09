@@ -43,7 +43,7 @@
       const highlightedCode = hljs.highlight(code, { language }).value;
       const langClass = `language-${language}`;
       const copyButton = `<button class="copy-button absolute right-0 mr-3 mt-3 top-0 text-xs bg-tertiary-600/30 opacity-75 text-white py-1 px-2 rounded hover:bg-tertiary-600/40" data-code="${btoa(code)}">Copy</button>`;
-      return `<pre class="hljs border border-surface-100/30 rounded-md px-5 py-4 overflow-x-auto relative">${copyButton}<code class="${langClass}">${highlightedCode}</code></pre>`;
+      return `<pre class="hljs border border-surface-100/30 rounded-md px-5 py-4 my-4 overflow-x-auto relative">${copyButton}<code class="${langClass}">${highlightedCode}</code></pre>`;
     },
   });
 
@@ -156,7 +156,7 @@
   on:touchend={handleSelectionEnd}
 >
   <div
-    class="card p-4 px-5 w-full overflow-x-auto space-y-3 font-light rounded-xl leading-8"
+    class="card p-4 px-5 w-full overflow-x-auto space-y-3 rounded-xl leading-8"
     class:variant-glass-surface={role === "assistant"}
     class:variant-glass={role === "user"}
   >
@@ -212,7 +212,11 @@
         </div>
       </div>
     {/if}
-    <div class="prose prose-invert max-w-xl">
+    <div
+      class="prose prose-invert max-w-xl {role === 'user'
+        ? 'text-surface-300'
+        : 'text-surface-100'}"
+    >
       {@html processedContent}
     </div>
   </div>
