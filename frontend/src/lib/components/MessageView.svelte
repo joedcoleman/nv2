@@ -42,8 +42,8 @@
       const language = hljs.getLanguage(lang) ? lang : "plaintext";
       const highlightedCode = hljs.highlight(code, { language }).value;
       const langClass = `language-${language}`;
-      const copyButton = `<button class="copy-button absolute right-0 mr-3 mt-3 top-0 text-xs bg-primary-400/40 opacity-75 text-white py-1 px-2 rounded hover:bg-primary-400/80" data-code="${btoa(code)}">Copy</button>`;
-      return `<pre class="hljs border border-primary-100/30 rounded-md px-5 py-4 overflow-x-auto relative">${copyButton}<code class="${langClass}">${highlightedCode}</code></pre>`;
+      const copyButton = `<button class="copy-button absolute right-0 mr-3 mt-3 top-0 text-xs bg-tertiary-600/30 opacity-75 text-white py-1 px-2 rounded hover:bg-tertiary-600/40" data-code="${btoa(code)}">Copy</button>`;
+      return `<pre class="hljs border border-surface-100/30 rounded-md px-5 py-4 overflow-x-auto relative">${copyButton}<code class="${langClass}">${highlightedCode}</code></pre>`;
     },
   });
 
