@@ -18,7 +18,7 @@
 
 <div></div>
 <button
-  class="btn btn-sm justify-between px-3 pt-1.5 text-sm"
+  class="btn btn-sm justify-end px-3 pt-1.5 text-sm w-40"
   use:popup={popupCombobox}
 >
   <span>{$appSettings.currentModel ?? "Model"}</span>
