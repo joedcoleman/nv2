@@ -137,6 +137,39 @@
       reader.readAsDataURL(imageFile);
     });
   }
+
+  async function captureScreen() {
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d");
+    const video = document.createElement("video");
+
+    try {
+      // Request access to the screen capture
+      const captureStream = await navigator.mediaDevices.getDisplayMedia();
+
+      // Play the video to load the data
+      video.srcObject = captureStream;
+      video.play();
+
+      // Draw the video frame to the canvas after the video has enough data
+      video.onloadedmetadata = () => {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        context?.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+
+        // Convert the canvas to a data URL
+        const frame = canvas.toDataURL("image/png");
+
+        // Stop all video tracks
+        captureStream.getTracks().forEach((track) => track.stop());
+
+        // Here you can handle the screenshot data URL (e.g., display it, send to server)
+        console.log(frame); // Or display in an <img> element, etc.
+      };
+    } catch (err) {
+      console.error("Error capturing screen:", err);
+    }
+  }
 </script>
 
 <div class="flex flex-col p-2 pt-1 w-full">
@@ -170,6 +203,7 @@
       spellcheck="false"
       on:input={adjustTextareaHeight}
       on:keydown={handleKeyDown}
+      disabled={!$isConnected}
     />
     <div
       class="rounded-r-md h-full bg-transparent flex items-start justify-center {$currentConversation
@@ -196,7 +230,9 @@
       {:else}
         <FileButton
           name="image"
-          button="btn-icon btn-icon-sm variant-filled-secondary"
+          button="btn-icon btn-icon-sm {$isConnected
+            ? 'variant-filled-secondary'
+            : 'bg-surface-500'}"
           bind:files={images}
           on:change={() => {
             if (images && images?.length > 0) {
@@ -217,7 +253,9 @@
             easing: quintOut,
           }}
           type="button"
-          class="btn-icon btn-icon-sm flex items-center variant-filled-primary"
+          class="btn-icon btn-icon-sm flex items-center {$isConnected
+            ? 'variant-filled-primary'
+            : 'bg-surface-500'}"
         >
           <MingcuteSendPlaneFill />
         </button>

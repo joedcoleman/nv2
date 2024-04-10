@@ -26,21 +26,9 @@
     in:fly={{ y: 50, duration: 500 }}
     out:fade
   >
-    <div class="mb-12 flex items-center justify-between gap-3 w-full">
-      <div>
-        <button
-          type="button"
-          class="btn btn-sm variant-glass flex items-center"
-        >
-          <div
-            class="w-2 h-2 rounded-full {$isConnected
-              ? 'bg-success-500'
-              : 'bg-error-500'}"
-          ></div>
-          <div class="text-xs">
-            {$isConnected ? "Connected" : "Disconnected"}
-          </div>
-        </button>
+    <div class="mb-10 flex items-start justify-between gap-3 w-full">
+      <div class="pt-2.5 pl-3">
+        <img src="/logo6.svg" alt="Company Logo" class="h-[1.4rem] w-auto" />
       </div>
       <ModelSelector index="home" />
     </div>
