@@ -49,6 +49,8 @@ function createWebSocketStore(url: string) {
 
             const newChunk = JSON.parse(event.data);
             
+            console.log(newChunk);
+
             if(newChunk.role === "error") {
                 notificationStore.set({
                     message: newChunk.content[0].text,

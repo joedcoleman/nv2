@@ -16,16 +16,16 @@
   };
 </script>
 
+<div></div>
 <button
   class="btn btn-sm justify-between px-3 pt-1.5 text-sm"
   use:popup={popupCombobox}
-  on:click={() => console.log("Clicked!")}
 >
-  <span>{$appSettings.currentModel ?? "Trigger"}</span>
+  <span>{$appSettings.currentModel ?? "Model"}</span>
   <span><GridiconsDropdown /></span>
 </button>
 <div
-  class="card bg-surface-300 w-48 shadow-xl py-2 z-30 text-sm"
+  class="card w-40 shadow-xl py-2 z-30 text-sm rounded-md variant-glass-secondary"
   data-popup="popupCombobox{index}"
 >
   <ListBox rounded="rounded-none">
@@ -37,5 +37,4 @@
       >
     {/each}
   </ListBox>
-  <div class="arrow bg-surface-100-800-token" />
 </div>

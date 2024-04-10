@@ -29,7 +29,7 @@
           return dateB.getTime() - dateA.getTime();
         })
         .slice(0, 5) as conversation}
-        {#if conversation.messages.length > 0 && conversation.messages[conversation.messages.length - 1].content[0].text.trim() !== ""}
+        {#if conversation.messages.length > 0}
           <li
             on:click={() => handleConversationClick(conversation.id)}
             class="p-4 cursor-pointer bg-transparent text-surface-100 hover:variant-glass-surface"
