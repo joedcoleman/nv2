@@ -28,7 +28,7 @@
   >
     <div class="mb-10 flex items-start justify-between gap-3 w-full">
       <div class="pt-2.5 pl-3">
-        <img src="/logo6.svg" alt="Company Logo" class="h-[1.4rem] w-auto" />
+        <img src="/logo.svg" alt="Neary" class="h-[1.4rem] w-auto" />
       </div>
       <ModelSelector index="home" />
     </div>
