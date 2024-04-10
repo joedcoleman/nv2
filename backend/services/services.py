@@ -1,5 +1,6 @@
 import uuid
 import toml
+import tiktoken
 from sqlalchemy.orm import Session
 from langchain_core.output_parsers import JsonOutputParser
 from langchain_openai.chat_models import ChatOpenAI
@@ -161,21 +162,7 @@ def _get_chat_model(settings: dict):
     match model:
         case "GPT-4":
             llm = ChatOpenAI(
-                model="gpt-4",
-                api_key=config["api_keys"]["OPENAI_API_KEY"],
-                request_timeout=request_timeout,
-                **kwargs,
-            )
-        case "GPT-4-Turbo":
-            llm = ChatOpenAI(
-                model="gpt-4-turbo-preview",
-                api_key=config["api_keys"]["OPENAI_API_KEY"],
-                request_timeout=request_timeout,
-                **kwargs,
-            )
-        case "GPT-4-Vision":
-            llm = ChatOpenAI(
-                model="gpt-4-vision-preview",
+                model="gpt-4-turbo",
                 api_key=config["api_keys"]["OPENAI_API_KEY"],
                 request_timeout=request_timeout,
                 **kwargs,
@@ -219,36 +206,88 @@ def generate_context(
     message_dict: dict,
     from_message_id: schemas.MessageOut = None,
 ):
-    """ This function returns context for the LLM call. TODO: Implement the max_tokens limit found in the message_dict, so that the LLM call does not exceed the limit. """
+    """This function returns context for the LLM call, ensuring the total token count does not exceed the max_tokens limit and the user message is always included."""
 
-    VISION_MODELS = ["GPT-4-Vision", "Claude Opus", "Claude Sonnet", "Claude Haiku"]
+    VISION_MODELS = ["GPT-4", "Claude Opus", "Claude Sonnet", "Claude Haiku"]
+
+    max_tokens = message_dict["meta_data"]["llm"].get("max_tokens", None)
+
+    tokenizer = tiktoken.encoding_for_model("gpt-4")
 
     def filter_content(content):
         if message_dict["meta_data"]["llm"]["model"] not in VISION_MODELS:
             return [item for item in content if item["type"] != "image_url"]
         return content
 
+    def encode_and_count_tokens(text):
+        return len(list(tokenizer.encode(text)))
+
+    user_message_content = " ".join(
+        [
+            item["text"]
+            for item in filter_content(message_dict["content"])
+            if item.get("text")
+        ]
+    )
+
+    # Ensure the user message is accounted for in the token count from the start
+    user_message_tokens = encode_and_count_tokens(user_message_content)
+    token_count = user_message_tokens
+
     context = []
+
+    if max_tokens is not None:
+        max_tokens -= user_message_tokens
 
     system_message = message_dict["meta_data"]["llm"].get("instructions", None)
 
     if system_message:
-        context.append(("system", system_message))
+        system_tokens = encode_and_count_tokens(system_message)
+        if max_tokens is None or token_count + system_tokens <= max_tokens:
+            context.append(("system", system_message))
+            token_count += system_tokens
 
     if from_message_id:
+
         for message in conversation.messages:
             if message.id == from_message_id:
                 break
+            message_content = " ".join(
+                [
+                    item["text"]
+                    for item in filter_content(message.content)
+                    if item.get("text")
+                ]
+            )
+            message_tokens = encode_and_count_tokens(message_content)
+            if max_tokens is not None and token_count + message_tokens > max_tokens:
+                continue
             context.append((message.role, filter_content(message.content)))
-        return context
+            token_count += message_tokens
     else:
-        context += [
-            (message.role, filter_content(message.content))
-            for message in conversation.messages
-        ]
-        context.append(("user", filter_content(message_dict["content"])))
+        for message in conversation.messages:
+            message_content = " ".join(
+                [
+                    item["text"]
+                    for item in filter_content(message.content)
+                    if item.get("text")
+                ]
+            )
+            message_tokens = encode_and_count_tokens(message_content)
+            print(message_tokens)
+            if max_tokens is not None and token_count + message_tokens > max_tokens:
+                continue
+            context.append((message.role, filter_content(message.content)))
+            token_count += message_tokens
 
-        return context
+    context.append(("user", filter_content(message_dict["content"])))
+
+    # Print out max_tokens and total token count
+    if max_tokens is not None:
+        print(f"Max tokens: {max_tokens + user_message_tokens}")
+    print(f"Total token count from added messages: {token_count}")
+
+    return context
 
 
 def generate_title(conversation_id: int, db: Session):
