@@ -175,7 +175,7 @@
 <div class="flex flex-col p-2 pt-1 w-full">
   <div
     class="flex rounded-md shadow-sm ring-0 {$currentConversation
-      ? 'bg-tertiary-200/10 border-0'
+      ? 'bg-tertiary-200/10 border-0 mx-auto max-w-3xl w-full'
       : 'bg-transparent border border-surface-400'}"
   >
     {#if $currentConversation}

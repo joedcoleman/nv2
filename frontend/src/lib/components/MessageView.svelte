@@ -156,7 +156,7 @@
   on:touchstart={handleSelectionStart}
   on:touchend={handleSelectionEnd}
 >
-  <div class="p-4 px-5 w-full overflow-x-auto">
+  <div class="p-4 max-w-3xl overflow-x-auto w-full mx-auto">
     <div
       class="text-sm flex grow-0 w-full justify-between items-center font-bold text-surface-100 fill-surface-100 mb-1.5"
     >
@@ -213,7 +213,7 @@
         </div>
       {/if}
     </div>
-    <div class="prose prose-invert max-w-xl text-surface-100">
+    <div class="prose prose-invert max-w-2xl text-surface-100">
       {@html processedContent}
     </div>
     {#if role === "assistant"}
