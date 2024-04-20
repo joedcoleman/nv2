@@ -50,7 +50,7 @@
 
 <div class="flex flex-col h-full max-w-full">
   <header
-    class="absolute h-12 top-0 left-0 right-0 bg-secondary-700 bg-opacity-30 backdrop-blur-md py-2 px-4 z-10 flex items-center gap-3"
+    class="absolute h-12 top-0 left-0 right-0 bg-surface-400/30 backdrop-blur-md py-2 px-4 z-10 flex items-center gap-3"
   >
     <div class="flex items-center shrink-0">
       <button on:click={handleBackClick} type="button" class="btn p-0 text-lg"

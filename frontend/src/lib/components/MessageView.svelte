@@ -18,6 +18,7 @@
   import MingcuteLeftLine from "~icons/mingcute/left-line";
   import { appSettings } from "$lib/stores/SettingsStore";
   import { notificationStore } from "$lib/stores/NotificationStore";
+  import GridiconsUser from "~icons/gridicons/user";
 
   export let message: Message;
 
@@ -155,23 +156,25 @@
   on:touchstart={handleSelectionStart}
   on:touchend={handleSelectionEnd}
 >
-  <div
-    class="card p-4 px-5 w-full overflow-x-auto space-y-3 rounded-xl leading-8"
-    class:variant-glass-surface={role === "assistant"}
-    class:variant-glass={role === "user"}
-  >
-    {#if role === "assistant"}
-      <div
-        class="text-xs flex grow-0 w-full justify-between items-center font-semibold text-surface-400 fill-surface-400"
-      >
-        <div class="flex w-1/3 items-center justify-start gap-1.5">
-          {#if ["GPT-4", "GPT-4-Turbo"].includes(message?.meta_data?.llm?.model)}
-            <TablerBrandOpenai />
-          {:else if ["Claude Opus", "Claude Haiku"].includes(message?.meta_data?.llm?.model)}
-            <AnthropicIcon />
-          {:else if ["Gemini Pro"].includes(message?.meta_data?.llm?.model)}
-            <TablerBrandGoogleFilled />
-          {/if}
+  <div class="p-4 px-5 w-full overflow-x-auto">
+    <div
+      class="text-sm flex grow-0 w-full justify-between items-center font-bold text-surface-100 fill-surface-100 mb-1.5"
+    >
+      {#if role === "assistant"}
+        <div class="flex w-1/3 items-center justify-start gap-2">
+          <div
+            class="flex items-center justify-center rounded-full h-6 w-6 text-xs bg-gradient-to-br from-primary-400 via-primary-500 to-primary-800"
+          >
+            {#if ["GPT-4", "GPT-4-Turbo"].includes(message?.meta_data?.llm?.model)}
+              <TablerBrandOpenai />
+            {:else if ["Claude Opus", "Claude Haiku"].includes(message?.meta_data?.llm?.model)}
+              <span class="text-[0.6rem] pb-[0.1rem] pr-[0.05rem]">
+                <AnthropicIcon />
+              </span>
+            {:else if ["Gemini Pro"].includes(message?.meta_data?.llm?.model)}
+              <TablerBrandGoogleFilled />
+            {/if}
+          </div>
           {message?.meta_data?.llm?.model}
         </div>
         {#if message?.meta_data?.versions.length > 1}
@@ -198,26 +201,37 @@
             </button>
           </div>
         {/if}
-        <div class="flex w-1/3 gap-2 items-center justify-end">
-          <button
-            class="btn p-0"
-            on:click={handleCopy}
-            use:clipboard={message?.content[0].text}
+        <div class="flex w-1/3 gap-2 items-center justify-end"></div>
+      {:else}
+        <div class="flex gap-2">
+          <div
+            class="variant-filled flex items-center justify-center rounded-full p-1 text-xs"
           >
-            <TablerClipboard />
-          </button>
-          <button class="btn p-0" on:click={regenerateMessage}>
-            <PajamasRetry class="text-xs cursor-pointer" />
-          </button>
+            <GridiconsUser />
+          </div>
+          You
         </div>
-      </div>
-    {/if}
-    <div
-      class="prose prose-invert max-w-xl {role === 'user'
-        ? 'text-surface-300'
-        : 'text-surface-100'}"
-    >
+      {/if}
+    </div>
+    <div class="prose prose-invert max-w-xl text-surface-100">
       {@html processedContent}
     </div>
+    {#if role === "assistant"}
+      <div class="flex justify-start gap-2 mt-3 text-surface-200 text-sm">
+        <button
+          class="variant-ghost rounded-md w-7 h-7 flex items-center justify-center hover:bg-surface-500"
+          on:click={handleCopy}
+          use:clipboard={message?.content[0].text}
+        >
+          <TablerClipboard />
+        </button>
+        <button
+          class="variant-ghost rounded-md w-7 h-7 flex items-center justify-center hover:bg-surface-500"
+          on:click={regenerateMessage}
+        >
+          <PajamasRetry class="text-xs cursor-pointer" />
+        </button>
+      </div>
+    {/if}
   </div>
 </div>
