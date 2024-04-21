@@ -19,6 +19,7 @@
   import { appSettings } from "$lib/stores/SettingsStore";
   import { notificationStore } from "$lib/stores/NotificationStore";
   import GridiconsUser from "~icons/gridicons/user";
+  import OcticonSparkleFill16 from "~icons/octicon/sparkle-fill-16";
 
   export let message: Message;
 
@@ -172,6 +173,8 @@
               </span>
             {:else if ["Gemini Pro"].includes(message?.meta_data?.llm?.model)}
               <TablerBrandGoogleFilled />
+            {:else}
+              <OcticonSparkleFill16 />
             {/if}
           </div>
           {message?.meta_data?.llm?.model}

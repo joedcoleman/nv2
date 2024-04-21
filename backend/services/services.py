@@ -1,6 +1,7 @@
 import uuid
 import toml
 import tiktoken
+from typing import Optional
 from sqlalchemy.orm import Session
 from langchain_core.output_parsers import JsonOutputParser
 from langchain_openai.chat_models import ChatOpenAI
@@ -44,12 +45,16 @@ async def process_message(
         context = generate_context(conversation, message_dict=message)
         ai_message_id = str(uuid.uuid4())
 
+    print("Getting chat model..")
+
     chat_model = _get_chat_model(message["meta_data"]["llm"])
+
+    print("Using chat model: ", chat_model)
 
     try:
         ai_message = ""
         streaming_metadata = {}
-
+        print("Streaming response!")
         async for chunk in chat_model.astream(context):
             if chunk.content:
                 ai_message += chunk.content
@@ -193,6 +198,11 @@ def _get_chat_model(settings: dict):
                 model="gemini-pro",
                 google_api_key=config["api_keys"]["GOOGLE_API_KEY"],
                 convert_system_message_to_human=True,
+                **kwargs,
+            )
+        case "Llama 3":
+            llm = ChatOpenRouter(
+                model="meta-llama/llama-3-70b-instruct:nitro",
                 **kwargs,
             )
         case _:
@@ -371,3 +381,24 @@ def get_conversation(conversation_id: str, db: Session):
 
 def get_message(message_id: str, db: Session):
     return db.query(models.Message).filter(models.Message.id == message_id).first()
+
+
+class ChatOpenRouter(ChatOpenAI):
+    openai_api_base: str
+    openai_api_key: str
+    model_name: str
+
+    def __init__(
+        self,
+        model: str,
+        openai_api_key: Optional[str] = None,
+        openai_api_base: str = "https://openrouter.ai/api/v1",
+        **kwargs,
+    ):
+        openai_api_key = config["api_keys"]["OPENROUTER_API_KEY"]
+        super().__init__(
+            openai_api_base=openai_api_base,
+            openai_api_key=openai_api_key,
+            model_name=model,
+            **kwargs,
+        )
