@@ -42,15 +42,13 @@ function createWebSocketStore(url: string) {
             clearTimeout(responseTimeoutTimer);
             responseTimeoutTimer = setTimeout(() => {
                 notificationStore.set({
-                    message: "Waiting for chat model..",
+                    message: "Waiting for chat model",
                     type: "warning",
                 });
             }, responseTimeoutDuration);
 
             const newChunk = JSON.parse(event.data);
             
-            console.log(newChunk);
-
             if(newChunk.role === "error") {
                 notificationStore.set({
                     message: newChunk.content[0].text,
@@ -65,7 +63,6 @@ function createWebSocketStore(url: string) {
             if (newChunk.status === "complete") {
                 clearTimeout(responseTimeoutTimer);
                 messageIncoming.set("false");
-                return;
             }
 
             isSelecting.subscribe((selecting) => {

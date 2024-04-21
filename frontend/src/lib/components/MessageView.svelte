@@ -23,9 +23,8 @@
   export let message: Message;
 
   function handleCopy() {
-    console.log("Handling copy!");
     notificationStore.set({
-      message: "Message copied!",
+      message: "Message copied",
       type: "info",
       settings: {
         hideDismiss: true,
@@ -60,7 +59,7 @@
         const sanitizedContent = md.render(item.text);
         renderedContent += sanitizedContent;
       } else if (item.type === "image_url") {
-        renderedContent += `<img src="${item.image_url.url}" alt="Image" class="max-w-44 rounded-md">`;
+        renderedContent += `<img src="${item.image_url.url}" alt="Image" class="max-w-44 rounded-md mt-4 -mb-1">`;
       }
     });
 
@@ -91,7 +90,7 @@
     const code = atob(button.dataset.code!);
     navigator.clipboard.writeText(code).then(() => {
       notificationStore.set({
-        message: "Code copied!",
+        message: "Code copied",
         type: "info",
         settings: {
           hideDismiss: true,
@@ -203,7 +202,7 @@
         {/if}
         <div class="flex w-1/3 gap-2 items-center justify-end"></div>
       {:else}
-        <div class="flex gap-2">
+        <div class="flex gap-2 items-center">
           <div
             class="variant-filled flex items-center justify-center rounded-full p-1 text-xs"
           >
@@ -216,7 +215,7 @@
     <div class="prose prose-invert max-w-2xl text-surface-100">
       {@html processedContent}
     </div>
-    {#if role === "assistant"}
+    {#if role === "assistant" && message.status != "incomplete"}
       <div class="flex justify-start gap-2 mt-3 text-surface-200 text-sm">
         <button
           class="variant-ghost rounded-md w-7 h-7 flex items-center justify-center hover:bg-surface-500"

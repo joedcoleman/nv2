@@ -39,21 +39,31 @@ function createConversationsStore() {
                     const existingMessageIndex = conversation.messages.findIndex(m => m.id === message.id);
         
                     if (existingMessageIndex !== -1) {
-                        // Message exists, update its content
-                        const updatedMessage = {
-                            ...conversation.messages[existingMessageIndex],
-                            content: conversation.messages[existingMessageIndex].content.map((item, index) => {
-                                if (item.type === 'text' && message.content[index]?.type === 'text') {
-                                    return {
-                                        ...item,
-                                        text: item.text + message.content[index].text,
-                                    };
-                                }
-                                return item;
-                            }),
-                            meta_data: message.meta_data,
-                        };
-                        conversation.messages[existingMessageIndex] = updatedMessage;
+                        // Message exists, check if the new message chunk status is 'complete'
+                        if (message.status === 'complete') {
+                            // Update only the status of the message
+                            const updatedMessage = {
+                                ...conversation.messages[existingMessageIndex],
+                                status: message.status,
+                            };
+                            conversation.messages[existingMessageIndex] = updatedMessage;
+                        } else {
+                            // Update its content as usual
+                            const updatedMessage = {
+                                ...conversation.messages[existingMessageIndex],
+                                content: conversation.messages[existingMessageIndex].content.map((item, index) => {
+                                    if (item.type === 'text' && message.content[index]?.type === 'text') {
+                                        return {
+                                            ...item,
+                                            text: item.text + message.content[index].text,
+                                        };
+                                    }
+                                    return item;
+                                }),
+                                meta_data: message.meta_data,
+                            };
+                            conversation.messages[existingMessageIndex] = updatedMessage;
+                        }
                     } else {
                         // New message, add to messages array
                         conversation.messages = [...conversation.messages, message];
@@ -96,7 +106,7 @@ function createConversationsStore() {
                     return [...conversations, newConversation];
                 }
             });
-        },
+        },        
     };
 }
 

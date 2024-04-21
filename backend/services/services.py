@@ -204,34 +204,27 @@ def _get_chat_model(settings: dict):
 def generate_context(
     conversation: schemas.ConversationOut,
     message_dict: dict,
-    from_message_id: schemas.MessageOut = None,
+    from_message_id: str = None,
 ):
     """This function returns context for the LLM call, ensuring the total token count does not exceed the max_tokens limit and the user message is always included."""
 
-    VISION_MODELS = ["GPT-4", "Claude Opus", "Claude Sonnet", "Claude Haiku"]
-
     max_tokens = message_dict["meta_data"]["llm"].get("max_tokens", None)
 
-    tokenizer = tiktoken.encoding_for_model("gpt-4")
+    # Reserve tokens for user message, which precedes the from_message_id value
+    regen_user_message_id = None
 
-    def filter_content(content):
-        if message_dict["meta_data"]["llm"]["model"] not in VISION_MODELS:
-            return [item for item in content if item["type"] != "image_url"]
-        return content
+    if from_message_id:
+        previous_message = None
+        for message in conversation.messages:
+            if message.id == from_message_id:
+                user_message = previous_message.content
+                regen_user_message_id = previous_message.id
+                break
+            previous_message = message
+    else:
+        user_message = message_dict["content"]
 
-    def encode_and_count_tokens(text):
-        return len(list(tokenizer.encode(text)))
-
-    user_message_content = " ".join(
-        [
-            item["text"]
-            for item in filter_content(message_dict["content"])
-            if item.get("text")
-        ]
-    )
-
-    # Ensure the user message is accounted for in the token count from the start
-    user_message_tokens = encode_and_count_tokens(user_message_content)
+    user_message_tokens = encode_and_count_tokens(user_message)
     token_count = user_message_tokens
 
     context = []
@@ -239,48 +232,33 @@ def generate_context(
     if max_tokens is not None:
         max_tokens -= user_message_tokens
 
+    # Append the system message first
     system_message = message_dict["meta_data"]["llm"].get("instructions", None)
 
     if system_message:
-        system_tokens = encode_and_count_tokens(system_message)
-        if max_tokens is None or token_count + system_tokens <= max_tokens:
+        system_message_tokens = encode_and_count_tokens(system_message)
+        if max_tokens is None or token_count + system_message_tokens <= max_tokens:
             context.append(("system", system_message))
-            token_count += system_tokens
+            token_count += system_message_tokens
 
     if from_message_id:
-
         for message in conversation.messages:
-            if message.id == from_message_id:
+            if message.id == from_message_id or message.id == regen_user_message_id:
                 break
-            message_content = " ".join(
-                [
-                    item["text"]
-                    for item in filter_content(message.content)
-                    if item.get("text")
-                ]
-            )
-            message_tokens = encode_and_count_tokens(message_content)
+            message_tokens = encode_and_count_tokens(message.content)
             if max_tokens is not None and token_count + message_tokens > max_tokens:
                 continue
-            context.append((message.role, filter_content(message.content)))
+            context.append((message.role, message.content))
             token_count += message_tokens
     else:
         for message in conversation.messages:
-            message_content = " ".join(
-                [
-                    item["text"]
-                    for item in filter_content(message.content)
-                    if item.get("text")
-                ]
-            )
-            message_tokens = encode_and_count_tokens(message_content)
-            print(message_tokens)
+            message_tokens = encode_and_count_tokens(message.content)
             if max_tokens is not None and token_count + message_tokens > max_tokens:
                 continue
-            context.append((message.role, filter_content(message.content)))
+            context.append((message.role, message.content))
             token_count += message_tokens
 
-    context.append(("user", filter_content(message_dict["content"])))
+    context.append(("user", user_message))
 
     # Print out max_tokens and total token count
     if max_tokens is not None:
@@ -288,6 +266,22 @@ def generate_context(
     print(f"Total token count from added messages: {token_count}")
 
     return context
+
+
+def encode_and_count_tokens(content: list | str):
+    tokenizer = tiktoken.encoding_for_model("gpt-4")
+
+    if type(content) == str:
+        return len(list(tokenizer.encode(content)))
+
+    tokens = 0
+    for item in content:
+        if "text" in item:
+            tokens += len(list(tokenizer.encode(item["text"])))
+        elif "image_url" in item:
+            tokens += 1000  # Sloppy approximation
+
+    return tokens
 
 
 def generate_title(conversation_id: int, db: Session):
