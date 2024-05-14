@@ -31,7 +31,7 @@
   onMount(() => {
     if (
       !/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-        navigator.userAgent,
+        navigator.userAgent
       )
     ) {
       textareaElement.focus();
@@ -109,7 +109,7 @@
 
     let currentHeight = parseInt(
       window.getComputedStyle(textareaElement).height,
-      10,
+      10
     );
 
     if (currentHeight > maxHeight) {
@@ -136,39 +136,6 @@
       };
       reader.readAsDataURL(imageFile);
     });
-  }
-
-  async function captureScreen() {
-    const canvas = document.createElement("canvas");
-    const context = canvas.getContext("2d");
-    const video = document.createElement("video");
-
-    try {
-      // Request access to the screen capture
-      const captureStream = await navigator.mediaDevices.getDisplayMedia();
-
-      // Play the video to load the data
-      video.srcObject = captureStream;
-      video.play();
-
-      // Draw the video frame to the canvas after the video has enough data
-      video.onloadedmetadata = () => {
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        context?.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
-
-        // Convert the canvas to a data URL
-        const frame = canvas.toDataURL("image/png");
-
-        // Stop all video tracks
-        captureStream.getTracks().forEach((track) => track.stop());
-
-        // Here you can handle the screenshot data URL (e.g., display it, send to server)
-        console.log(frame); // Or display in an <img> element, etc.
-      };
-    } catch (err) {
-      console.error("Error capturing screen:", err);
-    }
   }
 </script>
 

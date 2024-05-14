@@ -151,13 +151,9 @@ async def process_message(
 
 def _get_chat_model(settings: dict):
     model = settings["model"]
-    max_tokens = settings.get("max_tokens", None)
     temperature = settings.get("temperature", None)
     request_timeout = 10
     kwargs = {}
-
-    # if max_tokens is not None:
-    #     kwargs["max_tokens"] = max_tokens
 
     if temperature is not None:
         kwargs["temperature"] = temperature / 100
@@ -167,7 +163,7 @@ def _get_chat_model(settings: dict):
     match model:
         case "GPT-4":
             llm = ChatOpenAI(
-                model="gpt-4-turbo",
+                model="gpt-4o",
                 api_key=config["api_keys"]["OPENAI_API_KEY"],
                 request_timeout=request_timeout,
                 **kwargs,
@@ -216,64 +212,55 @@ def generate_context(
     message_dict: dict,
     from_message_id: str = None,
 ):
-    """This function returns context for the LLM call, ensuring the total token count does not exceed the max_tokens limit and the user message is always included."""
+    """Return context for LLM call, ensuring total token count doesn't exceed `max_tokens` and user message is always included."""
 
     max_tokens = message_dict["meta_data"]["llm"].get("max_tokens", None)
 
-    # Reserve tokens for user message, which precedes the from_message_id value
-    regen_user_message_id = None
-
+    user_message = None
+    # Find the message that precedes the from_message_id
     if from_message_id:
-        previous_message = None
-        for message in conversation.messages:
+        for index, message in enumerate(conversation.messages):
             if message.id == from_message_id:
-                user_message = previous_message.content
-                regen_user_message_id = previous_message.id
+                if index > 0:
+                    user_message = conversation.messages[index - 1].content
                 break
-            previous_message = message
-    else:
+
+    if not user_message:
         user_message = message_dict["content"]
 
-    user_message_tokens = encode_and_count_tokens(user_message)
-    token_count = user_message_tokens
+    total_tokens = encode_and_count_tokens(user_message)
 
     context = []
 
-    if max_tokens is not None:
-        max_tokens -= user_message_tokens
-
-    # Append the system message first
     system_message = message_dict["meta_data"]["llm"].get("instructions", None)
-
     if system_message:
-        system_message_tokens = encode_and_count_tokens(system_message)
-        if max_tokens is None or token_count + system_message_tokens <= max_tokens:
+        system_tokens = encode_and_count_tokens(system_message)
+        if max_tokens is None or system_tokens <= max_tokens:
             context.append(("system", system_message))
-            token_count += system_message_tokens
+            total_tokens += system_tokens
 
     if from_message_id:
-        for message in conversation.messages:
-            if message.id == from_message_id or message.id == regen_user_message_id:
+        start_index = (
+            conversation.messages.index(
+                next(m for m in conversation.messages if m.id == from_message_id)
+            )
+            - 1
+        )
+        for message in conversation.messages[start_index:]:
+            tokens = encode_and_count_tokens(message.content)
+            if max_tokens and total_tokens + tokens > max_tokens:
                 break
-            message_tokens = encode_and_count_tokens(message.content)
-            if max_tokens is not None and token_count + message_tokens > max_tokens:
-                continue
             context.append((message.role, message.content))
-            token_count += message_tokens
+            total_tokens += tokens
     else:
         for message in conversation.messages:
-            message_tokens = encode_and_count_tokens(message.content)
-            if max_tokens is not None and token_count + message_tokens > max_tokens:
-                continue
+            tokens = encode_and_count_tokens(message.content)
+            if max_tokens and total_tokens + tokens > max_tokens:
+                break
             context.append((message.role, message.content))
-            token_count += message_tokens
+            total_tokens += tokens
 
     context.append(("user", user_message))
-
-    # Print out max_tokens and total token count
-    if max_tokens is not None:
-        print(f"Max tokens: {max_tokens + user_message_tokens}")
-    print(f"Total token count from added messages: {token_count}")
 
     return context
 

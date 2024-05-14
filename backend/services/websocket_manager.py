@@ -13,5 +13,9 @@ class WebSocketManager:
         if self.websocket is not None:
             await self.websocket.send_json(message)
 
+    async def send_audio_chunk(self, data: bytes):
+        if self.websocket is not None:
+            await self.websocket.send_bytes(data)
+
 
 websocket_manager = WebSocketManager()
