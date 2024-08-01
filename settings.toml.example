@@ -1,5 +1,5 @@
 [settings]
-models = ["GPT-4", "Claude Opus", "Claude Haiku", "Gemini Pro"]
+models = ["GPT-4", "Claude Opus", "Claude Sonnet", "Claude Haiku", "Gemini Pro"]
 
 [api_keys]
 OPENAI_API_KEY = ""

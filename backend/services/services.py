@@ -184,7 +184,7 @@ def _get_chat_model(settings: dict):
             )
         case "Claude Sonnet":
             llm = ChatAnthropic(
-                model="claude-3-sonnet-20240229",
+                model="claude-3-5-sonnet-20240620",
                 anthropic_api_key=config["api_keys"]["ANTHROPIC_API_KEY"],
                 default_request_timeout=request_timeout,
                 **kwargs,

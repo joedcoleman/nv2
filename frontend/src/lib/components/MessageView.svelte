@@ -167,7 +167,7 @@
           >
             {#if ["GPT-4", "GPT-4-Turbo"].includes(message?.meta_data?.llm?.model)}
               <TablerBrandOpenai />
-            {:else if ["Claude Opus", "Claude Haiku"].includes(message?.meta_data?.llm?.model)}
+            {:else if ["Claude Opus", "Claude Sonnet", "Claude Haiku"].includes(message?.meta_data?.llm?.model)}
               <span class="text-[0.6rem] pb-[0.1rem] pr-[0.05rem]">
                 <AnthropicIcon />
               </span>
